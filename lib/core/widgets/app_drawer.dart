@@ -171,7 +171,7 @@ class AppDrawer extends ConsumerWidget {
                         label: 'Settings',
                         onTap: () {
                           Navigator.pop(context);
-                          context.go('/settings');
+                          context.push('/settings');
                         },
                       ),
                       _SimpleRow(

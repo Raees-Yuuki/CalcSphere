@@ -1,6 +1,9 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/color_tokens.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/services/history_service.dart';
@@ -15,7 +18,19 @@ class SettingsScreen extends ConsumerWidget {
     final accent = ref.watch(accentColorProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: const Text('Settings'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [

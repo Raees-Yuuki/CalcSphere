@@ -103,8 +103,22 @@ class _ModalNumPadState extends State<ModalNumPad> {
                 ),
                 const Spacer(),
                 GestureDetector(
+                  onTap: () =>
+                      Navigator.pop(context, _value.isEmpty ? null : _value),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.greenAccent,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, color: Colors.white70, size: 22),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white70,
+                    size: 22,
+                  ),
                 ),
               ],
             ),

@@ -11,7 +11,6 @@ class NumPad extends StatelessWidget {
   final VoidCallback? onEquals;
   final bool showOperators;
   final bool showDecimal;
-  final List<String>? extraKeys;
 
   const NumPad({
     super.key,
@@ -21,7 +20,6 @@ class NumPad extends StatelessWidget {
     this.onEquals,
     this.showOperators = false,
     this.showDecimal = true,
-    this.extraKeys,
   });
 
   @override
@@ -32,11 +30,11 @@ class NumPad extends StatelessWidget {
     List<List<String>> rows;
     if (showOperators) {
       rows = [
-        ['C', '(', ')', '÷'],
+        ['C', '( )', '%', '÷'],
         ['7', '8', '9', '×'],
         ['4', '5', '6', '−'],
         ['1', '2', '3', '+'],
-        ['0', '.', '⌫', '='],
+        ['0', '00', '.', '='],
       ];
     } else {
       rows = [
@@ -96,8 +94,8 @@ class NumPad extends StatelessWidget {
       case '−':
       case '×':
       case '÷':
-      case '(':
-      case ')':
+      case '( )':
+      case '%':
         HapticFeedback.mediumImpact();
         onKeyPressed(key);
         break;
@@ -148,7 +146,8 @@ class _NumKeyState extends State<_NumKey> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  bool get _isOperator => ['+', '−', '×', '÷', '(', ')'].contains(widget.label);
+  bool get _isOperator =>
+      ['+', '−', '×', '÷', '( )', '%'].contains(widget.label);
 
   bool get _isAction => ['⌫', '=', 'C'].contains(widget.label);
 
