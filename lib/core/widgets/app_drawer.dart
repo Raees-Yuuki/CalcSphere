@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../shared/models/calculator_info.dart';
 import '../../shared/providers/theme_provider.dart';
 
-/// iOS-style grouped card drawer with Favourites and All Calculators sections.
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
@@ -16,7 +15,6 @@ class AppDrawer extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final favouriteIds = ref.watch(favouritesProvider);
-    final themeMode = ref.watch(themeModeProvider);
 
     final favourites = favouriteIds
         .map((id) => CalculatorInfo.byId(id))
@@ -26,10 +24,16 @@ class AppDrawer extends ConsumerWidget {
       ..sort((a, b) => a.name.compareTo(b.name));
 
     return Drawer(
+      width: MediaQuery.of(context).size.width * 0.73,
       backgroundColor: isDark
           ? const Color(0xFF1C1C1E)
           : const Color(0xFFF2F2F7),
-      shape: const RoundedRectangleBorder(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
       child: SafeArea(
         child: Column(
           children: [
@@ -65,48 +69,6 @@ class AppDrawer extends ConsumerWidget {
                     ),
                   ),
                   const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      ref.read(themeModeProvider.notifier).toggle();
-                    },
-                    child: GestureDetector(
-                      onTap: () {
-                        ref.read(themeModeProvider.notifier).toggle();
-                      },
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(
-                          begin: 0,
-                          end: themeMode == ThemeMode.dark ? 1 : 0,
-                        ),
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                        builder: (context, value, child) {
-                          return Transform.rotate(
-                            angle: value * 3.14,
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withOpacity(0.08)
-                                    : Colors.black.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                value > 0.5
-                                    ? Icons.light_mode_rounded
-                                    : Icons.dark_mode_rounded,
-                                color: isDark
-                                    ? Colors.amberAccent
-                                    : Colors.orange,
-                                size: 22,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),

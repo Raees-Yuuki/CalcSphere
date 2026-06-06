@@ -45,7 +45,7 @@ class HistoryService {
   }
 
   /// Clear all history.
-  Future<void> clearAll() async {
+  Future<void> clearAll(String s) async {
     await _box.clear();
   }
 

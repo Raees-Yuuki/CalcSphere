@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Reusable numpad component matching iOS-clean design spec.
-/// Key size 72dp, 12dp radius, haptic feedback, press animations.
 class NumPad extends StatelessWidget {
   final void Function(String) onKeyPressed;
   final VoidCallback? onBackspace;

@@ -16,6 +16,7 @@ import '../../features/unit_price/presentation/unit_price_screen.dart';
 import '../../features/percentage/presentation/percentage_screen.dart';
 import '../../features/date_calculator/presentation/date_calculator_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/settings/presentation/theme_screen.dart';
 
 /// GoRouter configuration with deep links for all 16 calculators + settings.
 final appRouter = GoRouter(
@@ -106,6 +107,11 @@ final appRouter = GoRouter(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/theme',
+      name: 'theme',
+      builder: (context, state) => const ThemeScreen(),
     ),
   ],
   errorBuilder: (context, state) => const CalculatorScreen(),

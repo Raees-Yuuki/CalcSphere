@@ -1,8 +1,6 @@
 import 'package:intl/intl.dart';
 
-/// Number formatting utilities for CalcSphere.
 class NumberFormatter {
-  /// Format number in Indian system: 5646943131 → "56,46,43,131"
   static String formatIndian(num n) {
     if (n == 0) return '0';
     final isNegative = n < 0;
@@ -30,7 +28,6 @@ class NumberFormatter {
     return '${isNegative ? '-' : ''}${groups.join(',')},${last3}$decPart';
   }
 
-  /// Format number in international system: 5646943131 → "5,646,943,131"
   static String formatInternational(num n) {
     if (n is int) {
       return NumberFormat('#,###').format(n);
@@ -39,18 +36,15 @@ class NumberFormatter {
     return formatted;
   }
 
-  /// Format based on user preference.
   static String format(num n, {bool indian = true}) {
     return indian ? formatIndian(n) : formatInternational(n);
   }
 
-  /// Format with fixed decimal places.
   static String formatFixed(num n, int decimals, {bool indian = true}) {
     final rounded = double.parse(n.toStringAsFixed(decimals));
     final formatted = indian
         ? formatIndian(rounded)
         : formatInternational(rounded);
-    // Ensure decimal places
     if (!formatted.contains('.')) {
       return '$formatted.${List.filled(decimals, '0').join()}';
     }
@@ -61,7 +55,6 @@ class NumberFormatter {
     return formatted;
   }
 
-  /// Parse a formatted string back to num.
   static num? parse(String s) {
     final cleaned = s.replaceAll(',', '').replaceAll(' ', '');
     return num.tryParse(cleaned);
@@ -79,7 +72,6 @@ class NumberFormatter {
     return result;
   }
 
-  /// Format a display string for the calculator (no trailing zeros).
   static String formatDisplay(double n) {
     if (n == n.toInt().toDouble()) {
       return formatIndian(n.toInt());

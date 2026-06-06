@@ -1,11 +1,9 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/color_tokens.dart';
-import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/services/history_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -14,8 +12,6 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeMode = ref.watch(themeModeProvider);
-    final accent = ref.watch(accentColorProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,17 +35,7 @@ class SettingsScreen extends ConsumerWidget {
           _Card(
             isDark: isDark,
             children: [
-              _ThemeRow(
-                themeMode: themeMode,
-                onChanged: (m) =>
-                    ref.read(themeModeProvider.notifier).setThemeMode(m),
-              ),
-              _Divider(isDark: isDark),
-              _AccentRow(
-                current: accent,
-                onChanged: (c) =>
-                    ref.read(accentColorProvider.notifier).setColor(c),
-              ),
+              _ThemeNavRow(isDark: isDark, onTap: () => context.push('/theme')),
             ],
           ),
           const SizedBox(height: 24),
@@ -85,7 +71,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   );
                   if (confirm == true) {
-                    HistoryService().clearAll();
+                    HistoryService().clearAll('');
                     if (context.mounted)
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('History cleared')),
@@ -161,89 +147,6 @@ class _Divider extends StatelessWidget {
   );
 }
 
-class _ThemeRow extends StatelessWidget {
-  final ThemeMode themeMode;
-  final ValueChanged<ThemeMode> onChanged;
-  const _ThemeRow({required this.themeMode, required this.onChanged});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          const Icon(Icons.palette_rounded, size: 20, color: Color(0xFF8E8E93)),
-          const SizedBox(width: 12),
-          Text('Theme', style: GoogleFonts.inter(fontSize: 15)),
-          const Spacer(),
-          SegmentedButton<ThemeMode>(
-            segments: const [
-              ButtonSegment(
-                value: ThemeMode.light,
-                icon: Icon(Icons.light_mode, size: 16),
-              ),
-              ButtonSegment(
-                value: ThemeMode.system,
-                icon: Icon(Icons.phone_android, size: 16),
-              ),
-              ButtonSegment(
-                value: ThemeMode.dark,
-                icon: Icon(Icons.dark_mode, size: 16),
-              ),
-            ],
-            selected: {themeMode},
-            onSelectionChanged: (s) => onChanged(s.first),
-            style: ButtonStyle(visualDensity: VisualDensity.compact),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AccentRow extends StatelessWidget {
-  final Color current;
-  final ValueChanged<Color> onChanged;
-  const _AccentRow({required this.current, required this.onChanged});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.color_lens_rounded,
-            size: 20,
-            color: Color(0xFF8E8E93),
-          ),
-          const SizedBox(width: 12),
-          Text('Accent Color', style: GoogleFonts.inter(fontSize: 15)),
-          const Spacer(),
-          ...ColorTokens.accentPresets.map(
-            (c) => Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: GestureDetector(
-                onTap: () => onChanged(c),
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: c,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: current == c ? Colors.white : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _ActionRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -274,4 +177,58 @@ class _InfoRow extends StatelessWidget {
       style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF8E8E93)),
     ),
   );
+}
+
+class _ThemeNavRow extends StatelessWidget {
+  final bool isDark;
+  final VoidCallback onTap;
+  const _ThemeNavRow({required this.isDark, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final iconBgColor = isDark
+        ? const Color(0xFF3A3A3C)
+        : const Color(0xFFE5E5EA);
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      leading: Container(
+        height: 38,
+        width: 38,
+        decoration: BoxDecoration(
+          color: iconBgColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(
+          Icons.palette_outlined,
+          size: 20,
+          color: textColor.withOpacity(0.8),
+        ),
+      ),
+      title: Text(
+        'Theme',
+        style: GoogleFonts.inter(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+      subtitle: Text(
+        'Personalize the look and make it yours',
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: textColor.withOpacity(0.6),
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        size: 20,
+        color: isDark ? const Color(0xFF5C5C5E) : const Color(0xFFC6C6C8),
+      ),
+      onTap: onTap,
+    );
+  }
 }

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'num_pad.dart';
 
-/// Modal bottom-sheet numpad for specialty calculators.
-/// Dark header with field name, input display, and numpad.
 class ModalNumPad extends StatefulWidget {
   final String fieldName;
   final String unit;
@@ -18,7 +16,6 @@ class ModalNumPad extends StatefulWidget {
     this.allowDecimal = true,
   });
 
-  /// Show the modal and return the entered value (or null if dismissed).
   static Future<String?> show(
     BuildContext context, {
     required String fieldName,
