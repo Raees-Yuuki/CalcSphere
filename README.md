@@ -12,7 +12,7 @@
 
 *A beautifully designed, feature-rich calculator app built with Flutter — 16 calculators in one app, wrapped in a modern, iOS-inspired UI with full Material You theming.*
 
-[Features](#-features) · [Screenshots](#-screenshots) · [Tech Stack](#-tech-stack) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure)
+[Features](#-features) · [Getting Started](#-getting-started) 
 
 </div>
 
@@ -68,52 +68,6 @@ CalcSphere is a multi-purpose calculator app that goes beyond basic arithmetic. 
 - **Portrait-locked** — optimized exclusively for portrait mode
 
 </div>
-
-<h3 align="center">⚙️ Technical Highlights</h3>
-
-<div align="center">
-
-- **Riverpod** (`StateNotifierProvider`) — reactive state for theme, accent color, toggles, and favourites, all persisted to Hive
-- **go_router** — declarative routing across all 16 calculators + Settings + Theme screens
-- Expression-based calculator built on native `TextField` architecture
-- Custom `ExpressionTextEditingController` — colors operators (`+ − × ÷ ^ %`) inline using the live theme accent, with native cursor support
-- `DraggableScrollableSheet` history panel + bottom-sheet scientific function picker (trig, log, hyperbolic functions)
-- Feature-based folder structure (`controller` / `presentation` / `widgets` per feature) for clean separation of concerns
-- `SafeArea` handled correctly across all screens, including custom NumPad containers
-
-</div>
-
----
-
-<h2 align="center">📸 Screenshots</h2>
-
-<p align="center"><i>Coming soon — screenshots will be added after the first public release.</i></p>
-
----
-
-<h2 align="center">🛠 Tech Stack</h2>
-
-<div align="center">
-
-| Category | Technology |
-|----------|-----------|
-| **Framework** | [Flutter](https://flutter.dev) (SDK `^3.10.8`) |
-| **Language** | [Dart](https://dart.dev) 3.x |
-| **State Management** | [flutter_riverpod](https://riverpod.dev) `^2.6.1` |
-| **Routing** | [go_router](https://pub.dev/packages/go_router) `^14.8.1` |
-| **Local Storage** | [hive](https://pub.dev/packages/hive) / [hive_flutter](https://pub.dev/packages/hive_flutter) `^2.2.3` / `^1.1.0` |
-| **Dynamic Color** | [dynamic_color](https://pub.dev/packages/dynamic_color) `^1.8.1` |
-| **Fonts** | [google_fonts](https://pub.dev/packages/google_fonts) `^6.2.1` — Inter |
-| **Icons** | [iconsax](https://pub.dev/packages/iconsax), [lucide_icons](https://pub.dev/packages/lucide_icons), [lucide_icons_flutter](https://pub.dev/packages/lucide_icons_flutter) |
-| **Networking** | [http](https://pub.dev/packages/http) `^1.2.1`, [dio](https://pub.dev/packages/dio) `^5.7.0` |
-| **Charts** | [fl_chart](https://pub.dev/packages/fl_chart) `^0.68.0` |
-| **Utilities** | [intl](https://pub.dev/packages/intl), [uuid](https://pub.dev/packages/uuid), [connectivity_plus](https://pub.dev/packages/connectivity_plus), [auto_size_text](https://pub.dev/packages/auto_size_text) |
-| **Sharing / Info** | [share_plus](https://pub.dev/packages/share_plus), [url_launcher](https://pub.dev/packages/url_launcher), [package_info_plus](https://pub.dev/packages/package_info_plus) |
-| **Platform** | Android (package name: `calc_sphere`) |
-
-</div>
-
----
 
 <h2 align="center">🚀 Getting Started</h2>
 
