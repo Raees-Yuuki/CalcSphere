@@ -168,45 +168,6 @@ dependencies:
 
 ---
 
-<h2 align="center">📂 Project Structure</h2>
-
-```
-lib/
-├── main.dart                      # App entry point, Hive init, DynamicColorBuilder
-├── core/
-│   ├── router/app_router.dart     # go_router config — all 16 routes + settings/theme
-│   ├── theme/
-│   │   ├── app_theme.dart         # Light/Dark ThemeData, OLED variant
-│   │   └── color_tokens.dart      # iOS-inspired color system + accent presets
-│   ├── widgets/                   # Shared widgets: NumPad, ModalNumPad, AppDrawer, SwapButton
-│   └── utils/                     # expr_parser, number_formatter, input_validator
-├── features/
-│   ├── calculator/                # Standard + scientific calculator
-│   │   ├── controller/            # CalculatorController, ExpressionTextEditingController
-│   │   └── presentation/          # CalculatorScreen + widgets (editor, toolbar)
-│   ├── currency/
-│   ├── unit_converter/
-│   ├── discount/
-│   ├── gst/
-│   ├── fuel_cost/
-│   ├── fuel_efficiency/
-│   ├── body_metrics/
-│   ├── loan/
-│   ├── grade_average/             # GPA calculator
-│   ├── tip/
-│   ├── world_time/
-│   ├── hex_converter/
-│   ├── unit_price/
-│   ├── percentage/
-│   ├── date_calculator/
-│   └── settings/
-│       └── presentation/          # SettingsScreen, ThemeScreen, PalettePickerSheet
-└── shared/
-    ├── models/calculator_info.dart  # Metadata (id, name, route, icon, color) for drawer & routing
-    ├── providers/theme_provider.dart # Riverpod providers for theme mode, accent, toggles, favourites
-    └── services/history_service.dart # Hive-backed calculation history
-```
-
 <p align="center">Each feature module follows a <code>controller</code> / <code>presentation</code> / <code>widgets</code> split, keeping business logic separate from UI.</p>
 
 ---
