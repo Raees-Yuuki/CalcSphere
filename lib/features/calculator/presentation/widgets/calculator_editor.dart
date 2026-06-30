@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controller/calculator_controller.dart';
@@ -18,10 +20,9 @@ class CalculatorEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : Colors.black;
-
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

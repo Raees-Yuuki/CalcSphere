@@ -43,34 +43,59 @@ class NumPad extends StatelessWidget {
       ];
     }
 
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: rows.map((row) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: row.map((key) {
-                if (key.isEmpty) {
-                  return const Expanded(child: SizedBox(height: 56));
-                }
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: _NumKey(
-                      label: key,
-                      isDark: isDark,
-                      accentColor: theme.colorScheme.primary,
-                      onTap: () => _handleTap(key),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          );
-        }).toList(),
-      ),
+    final rowCount = rows.length;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availH = constraints.maxHeight;
+
+        // FIX 1: totalGap — pehle 8.0 tha jo sirf ek side ka padding count
+        // karta tha. EdgeInsets.all(8) top+bottom dono side lagata hai (16dp),
+        // plus har row ka 8dp bottom padding. Corrected formula:
+        final totalGap = 16.0 + (rowCount * 8.0);
+
+        // FIX 2: clamp(92.0, 96.0) → clamp(60.0, 100.0)
+        // Pehle wala tight clamp SizedBox ke constraints ignore karke hamesha
+        // ~96dp force karta tha. Ab wide range dete hain taaki key height
+        // screen size ke hisaab se properly adapt ho sake.
+        final keyH = availH > 100
+            ? ((availH - totalGap) / rowCount).clamp(60.0, 100.0)
+            : 60.0;
+
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            // FIX 3: mainAxisSize.min → MainAxisSize.max
+            // Min se Column sirf apne content jitna space leta tha.
+            // Max se ab Column parent SizedBox ki poori height fill karega.
+            mainAxisSize: MainAxisSize.max,
+            children: rows.map((row) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: row.map((key) {
+                    if (key.isEmpty) {
+                      return Expanded(child: SizedBox(height: keyH));
+                    }
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: _NumKey(
+                          label: key,
+                          isDark: isDark,
+                          accentColor: theme.colorScheme.primary,
+                          keyHeight: keyH,
+                          onTap: () => _handleTap(key),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 
@@ -109,12 +134,14 @@ class _NumKey extends StatefulWidget {
   final bool isDark;
   final Color accentColor;
   final VoidCallback onTap;
+  final double keyHeight;
 
   const _NumKey({
     required this.label,
     required this.isDark,
     required this.accentColor,
     required this.onTap,
+    this.keyHeight = 72,
   });
 
   @override
@@ -175,7 +202,7 @@ class _NumKeyState extends State<_NumKey> with SingleTickerProviderStateMixin {
         },
         onTapCancel: () => _controller.reverse(),
         child: Container(
-          height: 86,
+          height: widget.keyHeight,
           decoration: BoxDecoration(
             color: _bgColor,
             borderRadius: BorderRadius.circular(12),
@@ -195,11 +222,19 @@ class _NumKeyState extends State<_NumKey> with SingleTickerProviderStateMixin {
           ),
           alignment: Alignment.center,
           child: widget.label == '⌫'
-              ? Icon(Icons.backspace_rounded, color: _textColor, size: 27)
+              ? Icon(
+                  Icons.backspace_rounded,
+                  color: _textColor,
+                  // FIX 4: Font/icon size clamps widened to match new keyH range.
+                  // keyH ab 60-100dp range mein hoga, to clamp bhi match karna chahiye.
+                  size: (widget.keyHeight * 0.35).clamp(18.0, 34.0),
+                )
               : Text(
                   widget.label,
                   style: GoogleFonts.inter(
-                    fontSize: _isOperator ? 30 : 37,
+                    fontSize: _isOperator
+                        ? (widget.keyHeight * 0.4).clamp(18.0, 38.0)
+                        : (widget.keyHeight * 0.44).clamp(22.0, 46.0),
                     fontWeight: _isOperator ? FontWeight.w500 : FontWeight.w400,
                     color: _textColor,
                   ),

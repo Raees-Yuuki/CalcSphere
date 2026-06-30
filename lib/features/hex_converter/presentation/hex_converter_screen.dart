@@ -186,7 +186,14 @@ class _HexConverterScreenState extends State<HexConverterScreen> {
               child: Text(
                 value,
                 style: GoogleFonts.inter(
-                  fontSize: 22,
+                  // Scale down for long binary/hex strings
+                  fontSize: value.length > 24
+                      ? 13.0
+                      : value.length > 16
+                      ? 16.0
+                      : value.length > 10
+                      ? 19.0
+                      : 22.0,
                   fontWeight: FontWeight.w700,
                 ),
                 textAlign: TextAlign.right,

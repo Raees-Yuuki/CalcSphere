@@ -38,27 +38,26 @@ class _BodyMetricsScreenState extends State<BodyMetricsScreen> {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Unit + Gender
-              Row(
+              // Unit + Gender — Wrap allows chips to reflow on small/large-font screens
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   ChoiceChip(
                     label: const Text('Metric'),
                     selected: controller.metric,
                     onSelected: (_) => controller.setUnit(true),
                   ),
-                  const SizedBox(width: 8),
                   ChoiceChip(
                     label: const Text('Imperial'),
                     selected: !controller.metric,
                     onSelected: (_) => controller.setUnit(false),
                   ),
-                  const Spacer(),
                   ChoiceChip(
                     label: const Text('Male'),
                     selected: controller.male,
                     onSelected: (_) => controller.setGender(true),
                   ),
-                  const SizedBox(width: 8),
                   ChoiceChip(
                     label: const Text('Female'),
                     selected: !controller.male,
@@ -163,57 +162,67 @@ class _BodyMetricsScreenState extends State<BodyMetricsScreen> {
 
                       const SizedBox(height: 12),
 
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: SizedBox(
-                          height: 12,
-                          child: Stack(
-                            children: [
-                              Row(
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final barWidth = constraints.maxWidth;
+                          final pointerLeft =
+                              ((controller.bmi.clamp(10.0, 40.0) - 10) / 30) *
+                              barWidth;
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: SizedBox(
+                              height: 12,
+                              child: Stack(
                                 children: [
-                                  Expanded(
-                                    flex: 185,
-                                    child: Container(
-                                      color: const Color(0xFF5AC8FA),
-                                    ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 185,
+                                        child: Container(
+                                          color: const Color(0xFF5AC8FA),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 65,
+                                        child: Container(
+                                          color: const Color(0xFF34C759),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 50,
+                                        child: Container(
+                                          color: const Color(0xFFFF9500),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 100,
+                                        child: Container(
+                                          color: const Color(0xFFFF3B30),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Expanded(
-                                    flex: 65,
-                                    child: Container(
-                                      color: const Color(0xFF34C759),
+                                  Positioned(
+                                    left: (pointerLeft - 2).clamp(
+                                      0.0,
+                                      barWidth - 4,
                                     ),
-                                  ),
-                                  Expanded(
-                                    flex: 50,
                                     child: Container(
-                                      color: const Color(0xFFFF9500),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 100,
-                                    child: Container(
-                                      color: const Color(0xFFFF3B30),
+                                      width: 4,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-
-                              Positioned(
-                                left:
-                                    ((controller.bmi.clamp(10, 40) - 10) / 30) *
-                                    (MediaQuery.of(context).size.width - 64),
-                                child: Container(
-                                  width: 4,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    color: isDark ? Colors.white : Colors.black,
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 12),

@@ -6,7 +6,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/color_tokens.dart';
 import 'shared/providers/theme_provider.dart';
 
 Future<void> main() async {

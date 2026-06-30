@@ -301,30 +301,20 @@ class _GstScreenState extends State<GstScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildToggle(isDark, accent),
-                        const SizedBox(height: 24),
-                        _buildCards(isDark, accent),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          // Input fields area — sizes to its content to eliminate the empty space in the middle
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildToggle(isDark, accent),
+                const SizedBox(height: 24),
+                _buildCards(isDark, accent),
+              ],
             ),
           ),
-          _buildKeypadContainer(isDark, accent),
+          // Keypad — takes all remaining vertical space to maximize button heights
+          Expanded(child: _buildKeypadContainer(isDark, accent)),
         ],
       ),
     );
@@ -492,7 +482,7 @@ class _GstScreenState extends State<GstScreen> {
         });
       },
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.07,
+        constraints: const BoxConstraints(minHeight: 52, maxHeight: 72),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
@@ -517,12 +507,22 @@ class _GstScreenState extends State<GstScreen> {
                 color: const Color(0xFF8E8E93),
               ),
             ),
-            Text(
-              displayVal,
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: valColor,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  reverse: true,
+                  child: Text(
+                    displayVal,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: valColor,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -536,10 +536,10 @@ class _GstScreenState extends State<GstScreen> {
         ? const Color(0xFF1C1C1E)
         : const Color(0xFFF2F2F7);
 
+    // Height is now fully controlled by the Expanded in body Column
     return SafeArea(
       top: false,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.44,
         color: gridColor,
         padding: const EdgeInsets.only(left: 6, right: 6, top: 6, bottom: 8),
         child: _buildGstKeypad(isDark, accent),
@@ -555,123 +555,131 @@ class _GstScreenState extends State<GstScreen> {
     return Column(
       children: [
         // Row 1: 7, 8, 9, ⌫
-        Row(
-          children: [
-            _buildKey('7', onTap: () => _onKeyPressed('7'), isDark: isDark),
-            _buildKey('8', onTap: () => _onKeyPressed('8'), isDark: isDark),
-            _buildKey('9', onTap: () => _onKeyPressed('9'), isDark: isDark),
-            _buildKey(
-              '⌫',
-              onTap: _onBackspace,
-              bgColor: accent,
-              textColor: Colors.white,
-              child: const Icon(
-                Icons.backspace_rounded,
-                color: Colors.white,
-                size: 22,
+        Expanded(
+          child: Row(
+            children: [
+              _buildKey('7', onTap: () => _onKeyPressed('7'), isDark: isDark),
+              _buildKey('8', onTap: () => _onKeyPressed('8'), isDark: isDark),
+              _buildKey('9', onTap: () => _onKeyPressed('9'), isDark: isDark),
+              _buildKey(
+                '⌫',
+                onTap: _onBackspace,
+                bgColor: accent,
+                textColor: Colors.white,
+                child: const Icon(
+                  Icons.backspace_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+                isDark: isDark,
               ),
-              isDark: isDark,
-            ),
-          ],
+            ],
+          ),
         ),
         // Row 2: 4, 5, 6, ▼
-        Row(
-          children: [
-            _buildKey('4', onTap: () => _onKeyPressed('4'), isDark: isDark),
-            _buildKey('5', onTap: () => _onKeyPressed('5'), isDark: isDark),
-            _buildKey('6', onTap: () => _onKeyPressed('6'), isDark: isDark),
-            _buildKey(
-              '▼',
-              onTap: _onNextField,
-              bgColor: opBgColor,
-              textColor: accent,
-              child: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: accent,
-                size: 28,
+        Expanded(
+          child: Row(
+            children: [
+              _buildKey('4', onTap: () => _onKeyPressed('4'), isDark: isDark),
+              _buildKey('5', onTap: () => _onKeyPressed('5'), isDark: isDark),
+              _buildKey('6', onTap: () => _onKeyPressed('6'), isDark: isDark),
+              _buildKey(
+                '▼',
+                onTap: _onNextField,
+                bgColor: opBgColor,
+                textColor: accent,
+                child: Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: accent,
+                  size: 28,
+                ),
+                isDark: isDark,
               ),
-              isDark: isDark,
-            ),
-          ],
+            ],
+          ),
         ),
         // Row 3: 1, 2, 3, math
-        Row(
-          children: [
-            _buildKey('1', onTap: () => _onKeyPressed('1'), isDark: isDark),
-            _buildKey('2', onTap: () => _onKeyPressed('2'), isDark: isDark),
-            _buildKey('3', onTap: () => _onKeyPressed('3'), isDark: isDark),
-            _buildKey(
-              'math',
-              onTap: _onMathToggle,
-              bgColor: opBgColor,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '+',
-                        style: GoogleFonts.inter(
-                          color: accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+        Expanded(
+          child: Row(
+            children: [
+              _buildKey('1', onTap: () => _onKeyPressed('1'), isDark: isDark),
+              _buildKey('2', onTap: () => _onKeyPressed('2'), isDark: isDark),
+              _buildKey('3', onTap: () => _onKeyPressed('3'), isDark: isDark),
+              _buildKey(
+                'math',
+                onTap: _onMathToggle,
+                bgColor: opBgColor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '+',
+                          style: GoogleFonts.inter(
+                            color: accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '−',
-                        style: GoogleFonts.inter(
-                          color: accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(width: 4),
+                        Text(
+                          '−',
+                          style: GoogleFonts.inter(
+                            color: accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '×',
-                        style: GoogleFonts.inter(
-                          color: accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '×',
+                          style: GoogleFonts.inter(
+                            color: accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '=',
-                        style: GoogleFonts.inter(
-                          color: accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(width: 4),
+                        Text(
+                          '=',
+                          style: GoogleFonts.inter(
+                            color: accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
+                isDark: isDark,
               ),
-              isDark: isDark,
-            ),
-          ],
+            ],
+          ),
         ),
         // Row 4: 0, 00, ., C
-        Row(
-          children: [
-            _buildKey('0', onTap: () => _onKeyPressed('0'), isDark: isDark),
-            _buildKey('00', onTap: () => _onKeyPressed('00'), isDark: isDark),
-            _buildKey('.', onTap: () => _onKeyPressed('.'), isDark: isDark),
-            _buildKey(
-              'C',
-              onTap: _onClear,
-              bgColor: opBgColor,
-              textColor: accent,
-              isDark: isDark,
-            ),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              _buildKey('0', onTap: () => _onKeyPressed('0'), isDark: isDark),
+              _buildKey('00', onTap: () => _onKeyPressed('00'), isDark: isDark),
+              _buildKey('.', onTap: () => _onKeyPressed('.'), isDark: isDark),
+              _buildKey(
+                'C',
+                onTap: _onClear,
+                bgColor: opBgColor,
+                textColor: accent,
+                isDark: isDark,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -685,28 +693,31 @@ class _GstScreenState extends State<GstScreen> {
     Widget? child,
     required bool isDark,
   }) {
+    // Expanded + SizedBox.expand fills each Row's height, which is
+    // driven by the parent Column inside the Expanded(flex:44) area.
     return Expanded(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.095,
-        margin: const EdgeInsets.all(4.0),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
         child: Material(
           color: bgColor ?? (isDark ? const Color(0xFF2C2C2E) : Colors.white),
           borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
-            child: Center(
-              child:
-                  child ??
-                  Text(
-                    label,
-                    style: GoogleFonts.inter(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                      color:
-                          textColor ?? (isDark ? Colors.white : Colors.black),
+            child: SizedBox.expand(
+              child: Center(
+                child:
+                    child ??
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        color:
+                            textColor ?? (isDark ? Colors.white : Colors.black),
+                      ),
                     ),
-                  ),
+              ),
             ),
           ),
         ),

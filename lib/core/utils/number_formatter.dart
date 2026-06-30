@@ -7,7 +7,13 @@ class NumberFormatter {
     final abs = n.abs();
     final str = abs is int
         ? abs.toString()
-        : _trimTrailingZeros(abs.toStringAsFixed(10));
+        : (() {
+            final s = abs.toString();
+            if (s.contains('e') || s.contains('E')) {
+              return _trimTrailingZeros(abs.toStringAsFixed(10));
+            }
+            return s;
+          })();
 
     final parts = str.split('.');
     final intPart = parts[0];
@@ -41,18 +47,27 @@ class NumberFormatter {
   }
 
   static String formatFixed(num n, int decimals, {bool indian = true}) {
-    final rounded = double.parse(n.toStringAsFixed(decimals));
-    final formatted = indian
-        ? formatIndian(rounded)
-        : formatInternational(rounded);
-    if (!formatted.contains('.')) {
-      return '$formatted.${List.filled(decimals, '0').join()}';
+    if (n.isNaN || n.isInfinite) return n.toString();
+    final fixedStr = n.toStringAsFixed(decimals);
+    final parts = fixedStr.split('.');
+    final intStr = parts[0];
+    final decStr = parts.length > 1 ? parts[1] : '';
+
+    final isNegative = n < 0 || (n == 0 && fixedStr.startsWith('-'));
+    final absIntStr = intStr.replaceAll('-', '');
+    final absIntVal = int.tryParse(absIntStr) ?? 0;
+
+    String formattedInt;
+    if (indian) {
+      formattedInt = formatIndian(absIntVal);
+    } else {
+      formattedInt = formatInternational(absIntVal);
     }
-    final decPart = formatted.split('.')[1];
-    if (decPart.length < decimals) {
-      return '$formatted${'0' * (decimals - decPart.length)}';
+
+    if (decimals == 0) {
+      return '${isNegative ? '-' : ''}$formattedInt';
     }
-    return formatted;
+    return '${isNegative ? '-' : ''}$formattedInt.$decStr';
   }
 
   static num? parse(String s) {

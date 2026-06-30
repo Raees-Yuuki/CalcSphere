@@ -27,13 +27,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _ctrl = CalculatorController();
     _ctrl.onError = (msg) {
       if (!mounted) return;
+      final bottomInset = MediaQuery.of(context).padding.bottom;
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg, style: GoogleFonts.inter(fontSize: 14)),
           duration: const Duration(milliseconds: 1500),
           behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          margin: EdgeInsets.fromLTRB(16, 0, 16, bottomInset + 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
@@ -55,6 +56,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    // ── FIX: Screen height ka 58% NumPad ko dedo.
+    // Full screen height use karte hain (status bar + appbar included).
+    // 58% ek balanced value hai: keys ~76-88dp target, aur editor ko
+    // bhi sufficient space milti hai har screen size pe.
+    final numpadHeight = MediaQuery.of(context).size.height * 0.58;
 
     return Scaffold(
       drawer: const AppDrawer(),
@@ -87,27 +94,33 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ),
 
           // ── NumPad ──────────────────────────────────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(2),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
+          // FIX: SizedBox ke zariye NumPad ko fixed percentage height dete
+          // hain. Isse LayoutBuilder ko finite maxHeight milega aur keys
+          // properly proportional ho jaayenge — har screen pe.
+          SizedBox(
+            height: numpadHeight,
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(2),
                 ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: NumPad(
-                showOperators: true,
-                onKeyPressed: _ctrl.onKeyPressed,
-                onClear: _ctrl.onClear,
-                onEquals: _ctrl.onEquals,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: NumPad(
+                  showOperators: true,
+                  onKeyPressed: _ctrl.onKeyPressed,
+                  onClear: _ctrl.onClear,
+                  onEquals: _ctrl.onEquals,
+                ),
               ),
             ),
           ),
@@ -226,101 +239,116 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        height: MediaQuery.sizeOf(context).height * 0.65,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF333333),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              width: double.infinity,
-              child: Text(
-                'Scientific functions',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.60,
+        minChildSize: 0.40,
+        maxChildSize: 0.90,
+        expand: false,
+        builder: (ctx, sc) => Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            children: [
+              // Drag handle
+              Container(
+                margin: const EdgeInsets.only(top: 8, bottom: 4),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: fns.map((row) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: row.map((fn) {
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                _ctrl.onScientificFunctionSelected(fn);
-                              },
-                              child: Container(
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: cardColor,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                decoration: const BoxDecoration(color: Color(0xFF333333)),
+                width: double.infinity,
+                child: Text(
+                  'Scientific functions',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  controller: sc,
+                  padding: const EdgeInsets.all(16),
+                  children: fns.map((row) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: row.map((fn) {
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _ctrl.onScientificFunctionSelected(fn);
+                                },
+                                child: Container(
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: cardColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        blurRadius: 2,
+                                        offset: const Offset(0, 1),
                                       ),
-                                      blurRadius: 2,
-                                      offset: const Offset(0, 1),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    fn,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: textColor,
                                     ),
-                                  ],
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  fn,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: textColor,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  );
-                }).toList(),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            SafeArea(
-              top: false,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  color: cardColor,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'CANCEL',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : Colors.black,
+              SafeArea(
+                top: false,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    color: cardColor,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'CANCEL',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

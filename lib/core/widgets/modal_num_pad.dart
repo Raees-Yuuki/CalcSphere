@@ -84,9 +84,11 @@ class _ModalNumPadState extends State<ModalNumPad> {
           // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFF2C2C2E),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               children: [
@@ -95,25 +97,21 @@ class _ModalNumPadState extends State<ModalNumPad> {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: () =>
                       Navigator.pop(context, _value.isEmpty ? null : _value),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.greenAccent,
-                    size: 26,
-                  ),
+                  child: Icon(Icons.check, color: Colors.greenAccent, size: 26),
                 ),
                 const SizedBox(width: 16),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
-                    color: Colors.white70,
+                    color: isDark ? Colors.white70 : Colors.black54,
                     size: 22,
                   ),
                 ),

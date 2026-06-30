@@ -1,5 +1,4 @@
 // ignore_for_file: curly_braces_in_flow_control_structures, deprecated_member_use
-import 'package:calc_sphere/core/theme/color_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,7 +55,7 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
     final accent = ref.watch(accentColorProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final Color bgColor = theme.scaffoldBackgroundColor;
+    final Color bgColor = theme.cardColor;
     final Color cardColor = theme.cardColor;
     final Color borderColor =
         theme.dividerTheme.color ?? theme.colorScheme.outline;
@@ -71,92 +70,141 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
         backgroundColor: bgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: textColor,
-            size: 20,
-          ),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/settings');
-            }
-          },
+        toolbarHeight: kToolbarHeight + 24,
+        automaticallyImplyLeading: false,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            // ── Rounded back button ──
+            GestureDetector(
+              onTap: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/settings');
+                }
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF3A3A3C)
+                      : const Color(0xFFEAEAEA),
+                  borderRadius: BorderRadius.circular(10),
+                  border: isDark
+                      ? null
+                      : Border.all(color: const Color(0xFFCCCCCC), width: 1),
+                ),
+                child: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: textColor,
+                  size: 16,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Theme',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          'Theme',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
-        ),
-        centerTitle: false,
       ),
+
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
+          const SizedBox(height: 8),
           // ══════════════════════════════════════
-          // ── APPEARANCE SECTION ──
+          // ── APPEARANCE SECTION CARD ──
           // ══════════════════════════════════════
-          _SectionHeader(
-            title: 'Appearance',
-            expanded: _appearanceExpanded,
-            textColor: textColor,
-            onTap: () =>
-                setState(() => _appearanceExpanded = !_appearanceExpanded),
-          ),
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 300),
-            crossFadeState: _appearanceExpanded
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            firstChild: _buildAppearanceContent(
-              themeMode: themeMode,
-              defaultTheme: defaultTheme,
-              materialYou: materialYou,
-              liquidMode: liquidMode,
-              cardColor: cardColor,
-              borderColor: borderColor,
-              accentColor: accentColor,
-              textColor: textColor,
-              subtitleColor: subtitleColor,
-              iconBgColor: iconBgColor,
-              isDark: isDark,
+          Container(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: borderColor, width: 0.5),
             ),
-            secondChild: const SizedBox.shrink(),
-          ),
-          const SizedBox(height: 24),
-          // ══════════════════════════════════════
-          // ── EXTRAS SECTION ──
-          // ══════════════════════════════════════
-          _SectionHeader(
-            title: 'Extras',
-            expanded: _extrasExpanded,
-            textColor: textColor,
-            onTap: () => setState(() => _extrasExpanded = !_extrasExpanded),
-          ),
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 300),
-            crossFadeState: _extrasExpanded
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            firstChild: _buildExtrasContent(
-              themeMode: themeMode,
-              bloom: bloom,
-              oledMode: oledMode,
-              customThemeEnabled: customThemeEnabled,
-              cardColor: cardColor,
-              borderColor: borderColor,
-              accentColor: accentColor,
-              textColor: textColor,
-              subtitleColor: subtitleColor,
-              iconBgColor: iconBgColor,
-              isDark: isDark,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Column(
+              children: [
+                _SectionHeader(
+                  title: 'Appearance',
+                  expanded: _appearanceExpanded,
+                  textColor: accentColor,
+                  onTap: () => setState(
+                    () => _appearanceExpanded = !_appearanceExpanded,
+                  ),
+                ),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  crossFadeState: _appearanceExpanded
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  firstChild: _buildAppearanceContent(
+                    themeMode: themeMode,
+                    defaultTheme: defaultTheme,
+                    materialYou: materialYou,
+                    liquidMode: liquidMode,
+                    cardColor: cardColor,
+                    borderColor: borderColor,
+                    accentColor: accentColor,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    iconBgColor: iconBgColor,
+                    isDark: isDark,
+                  ),
+                  secondChild: const SizedBox.shrink(),
+                ),
+              ],
             ),
-            secondChild: const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 12),
+          // ══════════════════════════════════════
+          // ── EXTRAS SECTION CARD ──
+          // ══════════════════════════════════════
+          Container(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: borderColor, width: 0.5),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Column(
+              children: [
+                _SectionHeader(
+                  title: 'Extras',
+                  expanded: _extrasExpanded,
+                  textColor: accentColor,
+                  onTap: () =>
+                      setState(() => _extrasExpanded = !_extrasExpanded),
+                ),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  crossFadeState: _extrasExpanded
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  firstChild: _buildExtrasContent(
+                    themeMode: themeMode,
+                    bloom: bloom,
+                    oledMode: oledMode,
+                    customThemeEnabled: customThemeEnabled,
+                    cardColor: cardColor,
+                    borderColor: borderColor,
+                    accentColor: accentColor,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    iconBgColor: iconBgColor,
+                    isDark: isDark,
+                  ),
+                  secondChild: const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
           // ══════════════════════════════════════
           // ── CUSTOM THEMES GRID ──
@@ -269,6 +317,7 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
           onChanged: (val) {
             ref.read(defaultThemeProvider.notifier).set(val);
             if (val) {
+              ref.read(materialYouProvider.notifier).set(false);
               ref.read(customThemeEnabledProvider.notifier).set(false);
               ref
                   .read(customThemeColorProvider.notifier)
@@ -279,6 +328,7 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
             }
           },
         ),
+        const SizedBox(height: 5),
         _ToggleRow(
           icon: Icons.auto_awesome_rounded,
           iconBgColor: iconBgColor,
@@ -315,17 +365,26 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
                 ref.read(materialYouProvider.notifier).set(false);
               }
             } else {
-              // Revert to custom colour or default blue
+              // Material You turned OFF — restore previous active theme
               final customEnabled = ref.read(customThemeEnabledProvider);
-              final customColor = ref.read(customThemeColorProvider);
-              ref
-                  .read(accentColorProvider.notifier)
-                  .setColor(
-                    customEnabled ? customColor : ColorTokens.primaryAccent,
-                  );
+              if (customEnabled) {
+                // Custom theme was active: restore its color
+                final customColor = ref.read(customThemeColorProvider);
+                ref.read(accentColorProvider.notifier).setColor(customColor);
+              } else {
+                // Nothing else was active: re-enable Default Theme
+                ref.read(defaultThemeProvider.notifier).set(true);
+                ref
+                    .read(accentColorProvider.notifier)
+                    .setColor(
+                      const Color(0xFF3F51B5),
+                    ); // Indigo — same as Default Theme
+              }
             }
           },
         ),
+        const SizedBox(height: 5),
+
         _ToggleRow(
           icon: Icons.water_drop_rounded,
           iconBgColor: iconBgColor,
@@ -339,6 +398,8 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
           subtitleColor: subtitleColor,
           onChanged: (_) => ref.read(liquidModeProvider.notifier).toggle(),
         ),
+        const SizedBox(height: 5),
+
         _NavigationRow(
           icon: Icons.add_photo_alternate_outlined,
           iconBgColor: iconBgColor,
@@ -397,6 +458,8 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
           subtitleColor: subtitleColor,
           onChanged: (_) => ref.read(bloomProvider.notifier).toggle(),
         ),
+        const SizedBox(height: 5),
+
         _NavigationRow(
           icon: Icons.palette_outlined,
           iconBgColor: iconBgColor,
@@ -415,6 +478,8 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
             );
           },
         ),
+        const SizedBox(height: 5),
+
         Opacity(
           opacity: (themeMode != ThemeMode.light) ? 1.0 : 0.5,
           child: _ToggleRow(
@@ -433,6 +498,8 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
                 : null,
           ),
         ),
+        const SizedBox(height: 5),
+
         _ToggleRow(
           icon: Icons.color_lens_outlined,
           iconBgColor: iconBgColor,
@@ -448,6 +515,7 @@ class _ThemeScreenState extends ConsumerState<ThemeScreen>
             ref.read(customThemeEnabledProvider.notifier).set(val);
             if (val) {
               ref.read(defaultThemeProvider.notifier).set(false);
+              ref.read(materialYouProvider.notifier).set(false);
             }
           },
         ),
@@ -706,52 +774,57 @@ class _MiniPreview extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        // Fake content bars
+        // Fake content bars — widths are fractions of available space
         Row(
           children: [
-            _bar(accentColor.withOpacity(0.7), 18, 8),
+            Expanded(child: _bar(accentColor.withOpacity(0.7), 0.45, 8)),
             const SizedBox(width: 4),
-            _bar(mutedColor, 14, 8),
+            Expanded(child: _bar(mutedColor, 0.35, 8)),
             const SizedBox(width: 4),
-            _bar(accentColor.withOpacity(0.5), 10, 8),
+            Expanded(child: _bar(accentColor.withOpacity(0.5), 0.25, 8)),
           ],
         ),
         const SizedBox(height: 5),
         Row(
           children: [
-            _bar(fgColor.withOpacity(0.3), 22, 7),
+            Expanded(child: _bar(fgColor.withOpacity(0.3), 0.55, 7)),
             const SizedBox(width: 4),
-            _bar(accentColor.withOpacity(0.4), 12, 7),
+            Expanded(child: _bar(accentColor.withOpacity(0.4), 0.30, 7)),
             const SizedBox(width: 4),
-            _bar(mutedColor, 16, 7),
+            Expanded(child: _bar(mutedColor, 0.40, 7)),
           ],
         ),
         const SizedBox(height: 5),
         Row(
           children: [
-            _bar(mutedColor, 12, 7),
+            Expanded(child: _bar(mutedColor, 0.30, 7)),
             const SizedBox(width: 4),
-            _bar(fgColor.withOpacity(0.2), 20, 7),
+            Expanded(child: _bar(fgColor.withOpacity(0.2), 0.50, 7)),
           ],
         ),
       ],
     );
   }
-
-  Widget _dot(Color color, double size) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-  );
-  Widget _bar(Color color, double width, double height) => Container(
-    width: width,
-    height: height,
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(3),
-    ),
-  );
 }
+
+Widget _dot(Color color, double size) => Container(
+  width: size,
+  height: size,
+  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+);
+
+/// Width-fraction bars so they scale inside any card size.
+Widget _bar(Color color, double fraction, double height) =>
+    FractionallySizedBox(
+      widthFactor: fraction,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+    );
 
 /// Toggle row with icon badge, title, subtitle, and switch.
 class _ToggleRow extends StatelessWidget {
@@ -819,9 +892,10 @@ class _ToggleRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
+                    maxLines: 2,
                     subtitle,
                     style: GoogleFonts.inter(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.w400,
                       color: subtitleColor,
                     ),
@@ -872,7 +946,7 @@ class _NavigationRow extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(14),
@@ -975,23 +1049,41 @@ class _ColorThemeCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _tintBar(themeColor.color, 20, 8),
+                        Expanded(child: _tintBar(themeColor.color, 0.45, 8)),
                         const SizedBox(width: 4),
-                        _tintBar(themeColor.color.withOpacity(0.4), 14, 8),
+                        Expanded(
+                          child: _tintBar(
+                            themeColor.color.withOpacity(0.4),
+                            0.35,
+                            8,
+                          ),
+                        ),
                         const SizedBox(width: 4),
-                        _tintBar(themeColor.color.withOpacity(0.2), 10, 8),
+                        Expanded(
+                          child: _tintBar(
+                            themeColor.color.withOpacity(0.2),
+                            0.25,
+                            8,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        _tintBar(themeColor.color.withOpacity(0.3), 16, 7),
+                        Expanded(
+                          child: _tintBar(
+                            themeColor.color.withOpacity(0.3),
+                            0.40,
+                            7,
+                          ),
+                        ),
                         const SizedBox(width: 4),
-                        _tintBar(themeColor.color, 12, 7),
+                        Expanded(child: _tintBar(themeColor.color, 0.30, 7)),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    _tintBar(themeColor.color.withOpacity(0.15), 30, 6),
+                    _tintBar(themeColor.color.withOpacity(0.15), 0.75, 6),
                   ],
                 ),
               ),
